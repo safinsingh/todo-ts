@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/reseter.css/1.0.8/reseter.min.css"
+			integrity="sha512-w7sMEM5yzmuVP9ic9zpCLk/+whwrrhkH5g83x0wi5DEPo1y+/JniMmCVfbtjw5JipFpcCb4gyF2xLES6tc+TxA=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+		<title>Todos</title>
+	</head>
+	<body>
+		<h1>Todos</h1>
+		<button id="clear">Clear todos</button>
+		<form id="addTodo">
+			<label for="todo">Add a todo:</label>
+			<input type="text" id="todo" name="todo" /><input type="submit" />
+		</form>
+		<div id="todos"></div>
+		<script type="module" src="/src/main.ts"></script>
+	</body>
+</html>
