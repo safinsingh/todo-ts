@@ -80,6 +80,7 @@ rerender(getList());
 
 form.addEventListener("submit", (e) => {
 	e.preventDefault();
+	e.stopImmediatePropagation();
 
 	const data = new FormData(e.target! as HTMLFormElement);
 	const todo = data.get("todo");
