@@ -1,3 +1,4 @@
+import "./index.scss";
 import { v4 as uuidv4 } from "uuid";
 
 const LS_KEY = "TODO_LIST";
