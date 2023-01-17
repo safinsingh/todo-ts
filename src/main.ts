@@ -6,7 +6,6 @@ const form = document.getElementById("addTodo")!;
 const todos = document.getElementById("todos")!;
 const clear = document.getElementById("clear")!;
 const todoInput = document.getElementById("todo")! as HTMLInputElement;
-let justToggled = false;
 
 type Todo = {
 	text: string;
@@ -69,7 +68,6 @@ const toggleTodo = (id: string) => {
 	const todoId = prevList.findIndex((todo) => todo.id === id);
 	prevList[todoId]["complete"] = !prevList[todoId]["complete"];
 
-	justToggled = true;
 	return setList(prevList);
 };
 
