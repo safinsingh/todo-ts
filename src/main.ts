@@ -30,27 +30,26 @@ const rerender = (todoList: Todo[]) => {
 		const todoDiv = document.createElement("div");
 		const todoText = document.createElement("p");
 		const todoRemove = document.createElement("button");
+		const todoCheckbox = document.createElement("div");
 
+		todoCheckbox.classList.add("todoCheckbox");
 		todoDiv.classList.add("todoDiv");
 		todoText.innerHTML = todo.text;
-		todoText.style.textDecoration = todo.complete ? "line-through" : "none";
-		todoText.style.cursor = "pointer";
-		todoRemove.innerHTML = "x";
+		if (todo.complete) todoDiv.classList.add("todoComplete");
 
-		todoRemove.addEventListener("click", () => rerender(removeTodo(todo.id)));
-		todoText.addEventListener("click", () => rerender(toggleTodo(todo.id)));
-		todoText.addEventListener("mouseover", () => {
-			if (justToggled) return;
-			todoText.style.textDecoration = !todo.complete ? "line-through" : "none";
+		todoText.style.cursor = "pointer";
+		todoRemove.innerHTML = "&#10005;";
+
+		todoRemove.addEventListener("click", () => {
+			if (!(prompt("Are you sure you would like to remove this todo? [y/N]") === "y")) return;
+			rerender(removeTodo(todo.id));
 		});
-		todoText.addEventListener("mouseleave", () => {
-			justToggled = false;
-			todoText.style.textDecoration = todo.complete ? "line-through" : "none";
-		});
+		todoCheckbox.addEventListener("click", () => rerender(toggleTodo(todo.id)));
 
 		todos.appendChild(todoDiv);
-		todoDiv.appendChild(todoRemove);
+		todoDiv.appendChild(todoCheckbox);
 		todoDiv.appendChild(todoText);
+		todoDiv.appendChild(todoRemove);
 	});
 };
 

@@ -1,6 +1,7 @@
 // site color: #cca300
 $background: #292928;
 $background-muted: lighten($background, 15%);
+$background-darker: darken($background, 5%);
 $foreground: #d7cfbe;
 $accent: #ffcc00;
 $rounding: 3px;
@@ -42,13 +43,42 @@ label {
 }
 
 .todoDiv {
-	* {
-		display: inline-block;
+	padding: 0.5rem 1rem;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	background-color: $background-muted;
+
+	p {
+		margin: 0;
 	}
 
 	button {
+		margin-left: auto;
+	}
+
+	p,
+	.todoCheckbox {
 		margin-right: 0.5rem;
 	}
 
-    margin-top: 0.5rem;
+	margin-top: 0.5rem;
+}
+
+.todoCheckbox {
+	height: 16px;
+	width: 16px;
+	border-radius: 50%;
+	background-color: $foreground;
+	cursor: pointer;
+}
+
+.todoComplete {
+	& > .todoCheckbox {
+		background-color: $background-muted;
+		box-shadow: inset 0 0 0 4px $foreground;
+	}
+	p {
+		text-decoration: line-through;
+	}
 }
