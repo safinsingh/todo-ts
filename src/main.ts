@@ -8,19 +8,18 @@ const isLocalhost = Boolean(
 		)
 );
 const api = isLocalhost
-	? "http://localhost"
+	? "http://localhost:8199"
 	: "http://saakd.nighthawkcodingsociety.com";
 
 const form = document.getElementById("addTodo")!;
 const todos = document.getElementById("todos")!;
 const clear = document.getElementById("clear")!;
 const todoInput = document.getElementById("todo")! as HTMLInputElement;
-let justToggled = false;
 let todosLocal = [] as Todo[];
 
 type Todo = {
 	text: string;
-	complete: boolean;
+	completed: boolean;
 	id: string;
 };
 
@@ -40,7 +39,7 @@ const rerender = () => {
 		todoCheckbox.classList.add("todoCheckbox");
 		todoDiv.classList.add("todoDiv");
 		todoText.innerHTML = todo.text;
-		if (todo.complete) todoDiv.classList.add("todoComplete");
+		if (todo.completed) todoDiv.classList.add("todoComplete");
 
 		todoText.style.cursor = "pointer";
 		todoRemove.innerHTML = "&#10005;";
@@ -104,16 +103,14 @@ const toggleTodo = async (id: string) => {
 	}).then((r) => r.json());
 
 	const idx = todosLocal.findIndex((t) => t.id === todo.id);
-	todosLocal[idx].complete = todo.complete;
-
-	justToggled = true;
+	todosLocal[idx].completed = todo.completed;
 	rerender();
 };
 
 const clearTodos = async () => {
-	const list = await fetch(api + "/todoList", { method: "DELETE" }).then((r) =>
-		r.json()
-	);
+	const list = await fetch(api + "/todoList", {
+		method: "DELETE",
+	}).then((r) => r.json());
 	todosLocal = list;
 	rerender();
 };
