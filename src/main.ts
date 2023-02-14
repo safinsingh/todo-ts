@@ -1,12 +1,22 @@
 import "./index.scss";
-import { v4 as uuidv4 } from "uuid";
 
-const LS_KEY = "TODO_LIST";
+const isLocalhost = Boolean(
+	window.location.hostname === "localhost" ||
+		window.location.hostname === "[::1]" ||
+		window.location.hostname.match(
+			/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+		)
+);
+const api = isLocalhost
+	? "http://localhost"
+	: "http://saakd.nighthawkcodingsociety.com";
+
 const form = document.getElementById("addTodo")!;
 const todos = document.getElementById("todos")!;
 const clear = document.getElementById("clear")!;
 const todoInput = document.getElementById("todo")! as HTMLInputElement;
 let justToggled = false;
+let todosLocal = [] as Todo[];
 
 type Todo = {
 	text: string;
@@ -14,19 +24,14 @@ type Todo = {
 	id: string;
 };
 
-const getList = () => {
-	const rawList = localStorage.getItem(LS_KEY);
-	return JSON.parse(rawList ?? "[]") as Todo[];
+const getList = async () => {
+	const list = await fetch(api + "/todoList").then((r) => r.json());
+	todosLocal = list;
 };
 
-const setList = (newList: Todo[]) => {
-	localStorage.setItem(LS_KEY, JSON.stringify(newList));
-	return newList;
-};
-
-const rerender = (todoList: Todo[]) => {
+const rerender = () => {
 	todos.innerHTML = "";
-	todoList.forEach((todo) => {
+	todosLocal.forEach((todo) => {
 		const todoDiv = document.createElement("div");
 		const todoText = document.createElement("p");
 		const todoRemove = document.createElement("button");
@@ -37,8 +42,10 @@ const rerender = (todoList: Todo[]) => {
 		todoText.style.cursor = "pointer";
 		todoRemove.innerHTML = "x";
 
-		todoRemove.addEventListener("click", () => rerender(removeTodo(todo.id)));
-		todoText.addEventListener("click", () => rerender(toggleTodo(todo.id)));
+		todoRemove.addEventListener("click", () => {
+			removeTodo(todo.id);
+		});
+		todoText.addEventListener("click", () => toggleTodo(todo.id));
 		todoText.addEventListener("mouseover", () => {
 			if (justToggled) return;
 			todoText.style.textDecoration = !todo.complete ? "line-through" : "none";
@@ -57,26 +64,62 @@ const rerender = (todoList: Todo[]) => {
 // handlers
 // todo: optimize rendering (diff algo)
 
-const addTodo = (todo: string) => {
-	return setList([...getList(), { text: todo, complete: false, id: uuidv4() }]);
+const addTodo = async (text: string) => {
+	const todo = await fetch(api + "/todo", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ text }),
+	}).then((r) => r.json());
+
+	todosLocal.push(todo);
+	rerender();
 };
 
-const removeTodo = (id: string) => {
-	return setList(getList().filter((todo) => todo.id !== id));
+const removeTodo = async (id: string) => {
+	const todo = await fetch(api + "/todo", {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ id }),
+	}).then((r) => r.json());
+
+	todosLocal = todosLocal.filter((t) => t.id !== todo.id);
+	rerender();
 };
 
-const toggleTodo = (id: string) => {
-	const prevList = getList();
-	const todoId = prevList.findIndex((todo) => todo.id === id);
-	prevList[todoId]["complete"] = !prevList[todoId]["complete"];
+const toggleTodo = async (id: string) => {
+	const todo = await fetch(api + "/todo", {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ id }),
+	}).then((r) => r.json());
+
+	const idx = todosLocal.findIndex((t) => t.id === todo.id);
+	todosLocal[idx].complete = todo.complete;
 
 	justToggled = true;
-	return setList(prevList);
+	rerender();
+};
+
+const clearTodos = async () => {
+	const list = await fetch(api + "/todoList", { method: "DELETE" }).then((r) =>
+		r.json()
+	);
+	todosLocal = list;
+	rerender();
 };
 
 // onloads
 
-rerender(getList());
+const main = async () => {
+	await getList();
+	rerender();
+};
 
 form.addEventListener("submit", (e) => {
 	e.preventDefault();
@@ -86,13 +129,12 @@ form.addEventListener("submit", (e) => {
 	const todo = data.get("todo");
 	if (!todo) return;
 
-	const newTodos = addTodo(todo.toString());
+	addTodo(todo.toString());
 	todoInput.value = "";
-	rerender(newTodos);
 });
 
-clear.addEventListener("click", () => {
-	rerender(setList([]));
-});
+clear.addEventListener("click", clearTodos);
+
+main();
 
 export {};
