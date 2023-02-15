@@ -3,13 +3,9 @@ import "./index.scss";
 const isLocalhost = Boolean(
 	window.location.hostname === "localhost" ||
 		window.location.hostname === "[::1]" ||
-		window.location.hostname.match(
-			/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
-		)
+		window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
-const api = isLocalhost
-	? "http://localhost:8199"
-	: "http://saakd.nighthawkcodingsociety.com";
+const api = isLocalhost ? "http://localhost:8199" : "https://saakd.nighthawkcodingsociety.com";
 
 const form = document.getElementById("addTodo")!;
 const todos = document.getElementById("todos")!;
@@ -45,14 +41,7 @@ const rerender = () => {
 		todoRemove.innerHTML = "&#10005;";
 
 		todoRemove.addEventListener("click", () => {
-			if (
-				!(
-					prompt("Are you sure you would like to remove this todo? [y/N]") ===
-					"y"
-				)
-			)
-				return;
-
+			if (!(prompt("Are you sure you would like to remove this todo? [y/N]") === "y")) return;
 			removeTodo(todo.id);
 		});
 		todoCheckbox.addEventListener("click", () => toggleTodo(todo.id));
